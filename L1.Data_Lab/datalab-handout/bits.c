@@ -143,7 +143,9 @@ NOTES:
  *   Rating: 1
  */
 int bitXor(int x, int y) {
-  return x & (~y) + y & (~x);
+	int val1 = x & (~y);
+	int val2 = y & (~x);
+  return ~((~val1) & (~val2));
 }
 /* 
  * tmin - return minimum two's complement integer 
@@ -152,8 +154,7 @@ int bitXor(int x, int y) {
  *   Rating: 1
  */
 int tmin(void) {
-
-  return 2;
+  return 1 << 31;
 
 }
 //2
@@ -165,7 +166,8 @@ int tmin(void) {
  *   Rating: 1
  */
 int isTmax(int x) {
-  return 2;
+	int res = (x ^ (x + 1)) + 1 + !(x + 1);
+  return !res;
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
@@ -176,7 +178,10 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return 2;
+	int odd;
+	odd = (((0xAA & x) & (x >> 8)) & (x >> 16)) & (x >> 24);
+	odd = odd + (~0xAA + 1);
+  return !odd;
 }
 /* 
  * negate - return -x 
@@ -186,7 +191,7 @@ int allOddBits(int x) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+  return ~x + 1;
 }
 //3
 /* 
@@ -199,7 +204,10 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  return 2;
+	int condition1, condition2;
+	condition1 = ((x + (~0x30 + 1)) >> 31) & 1;
+	condition2 = ((0x39 + (~x + 1)) >> 31) & 1;
+  return !(condition1 + condition2);
 }
 /* 
  * conditional - same as x ? y : z 
@@ -209,7 +217,10 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+	int key = (!x) + (~0);
+	int y_side = key & y;
+	int z_side = (~key) & z;
+  return y_side + z_side;
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
@@ -219,7 +230,10 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+	int neg_x = ~x + 1;
+	int key = ((y + neg_x) >> 31) & 1;
+	int is_diff_sign = ((x ^ y) >> 31) & 1;
+	return (is_diff_sign & (x >> 31)) + ((!is_diff_sign) & (!key));
 }
 //4
 /* 
@@ -231,7 +245,8 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-  return 2;
+	int key = ((x ^ (x + (~0))) >> 31) & 1;
+  return key & ((~x) >> 31);
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -246,7 +261,31 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-  return 0;
+	int is_neg = (x >> 31) & 1;
+	int key = !is_neg + (~0);
+	int condition, condition2, key2, key3, ans1, ans2, ans3;
+	x = (key & (~x)) + ((~key) & x);
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+	x = (x << 1) + 1;
+	condition = (x >> 15) & 1;
+	key2 = (!condition) + (~0);
+	ans1 = key2 & 16;
+	condition2 = (x >> (ans1 + 7)) & 1;
+	key3 = (!condition2) + (~0);
+	ans2 = key3 & 8;
+	ans3 = (x >> (ans1 + ans2)) & 1;
+	ans3 += (x >> (ans1 + ans2 + 1)) & 1;
+	ans3 += (x >> (ans1 + ans2 + 2)) & 1;
+	ans3 += (x >> (ans1 + ans2 + 3)) & 1;
+	ans3 += (x >> (ans1 + ans2 + 4)) & 1;
+	ans3 += (x >> (ans1 + ans2 + 5)) & 1;
+	ans3 += (x >> (ans1 + ans2 + 6)) & 1;
+	ans3 += (x >> (ans1 + ans2 + 7)) & 1;
+  return ans1 + ans2 + ans3;
 }
 //float
 /* 
@@ -261,7 +300,20 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-  return 2;
+	int indicator = 1, indicator2 = 1, i = 30;
+	while (i > 22) {
+		indicator &= (uf >> i);
+		indicator2 &= ((~uf) >> i);
+		i -= 1;
+	}
+	if (indicator) {
+		return uf;
+	}
+	if (indicator2) {
+		return (uf & (1 << 31)) + (uf << 1);
+	}
+	return uf + (1 << 23);
+	
 }
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
@@ -276,7 +328,33 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
+	int indicator1 = 1, indicator2 = 1, i = 30, inf = (1 << 31);
+	int exp, tt, f, is_minus = (uf >> 31) & 1, res;
+	while (i > 22) {
+		indicator1 &= (uf >> i);
+		indicator2 &= ((~uf) >> i);
+		i -= 1;
+	}
+	if (indicator1) {
+		return inf;
+	}
+	if (indicator2) {
+		return 0;
+	}
+	exp = ((uf >> 23) & 255) - 127;
+	if (exp >> 31) {
+		return 0;
+	}
+	if (exp > 30) {
+		return inf;
+	}
+	tt = (1 << 23) - 1;
+	f = uf & tt;
+	res = ((f << (exp - 23)) & ((1 << exp) - 1)) + (1 << exp);
+	if (is_minus) {
+		return -res;
+	}
+  return res;
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
