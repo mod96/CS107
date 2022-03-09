@@ -4,53 +4,53 @@ Email 1: bovik@nowhere.edu
 
 Rotate: Version = naive_rotate: Naive baseline implementation:
 Dim		64	128	256	512	1024	Mean
-Your CPEs	1.8	2.5	4.9	9.1	8.5
+Your CPEs	1.7	2.5	5.2	9.0	8.2
 Baseline CPEs	1.8	2.6	5.6	9.3	8.5
 Speedup		1.0	1.0	1.1	1.0	1.0	1.0
 
 Rotate: Version = rotate_1_only unroll:
 Dim		64	128	256	512	1024	Mean
-Your CPEs	1.8	2.2	2.8	4.7	6.8
+Your CPEs	1.7	2.1	3.1	4.8	6.4
 Baseline CPEs	1.8	2.6	5.6	9.3	8.5
-Speedup		1.0	1.2	2.0	2.0	1.3	1.4
+Speedup		1.1	1.2	1.8	1.9	1.3	1.4
 
 Rotate: Version = rotate_1_unroll_and_param_optim:
 Dim		64	128	256	512	1024	Mean
-Your CPEs	1.7	2.1	2.8	4.7	6.9
+Your CPEs	1.7	2.1	3.0	4.8	6.3
 Baseline CPEs	1.8	2.6	5.6	9.3	8.5
-Speedup		1.1	1.2	2.0	2.0	1.2	1.4
+Speedup		1.1	1.3	1.8	1.9	1.4	1.5
 
 Rotate: Version = rotate_2_only unroll_4x4:
 Dim		64	128	256	512	1024	Mean
-Your CPEs	1.9	2.2	2.6	3.1	4.0
+Your CPEs	1.8	2.1	2.6	3.1	4.1
 Baseline CPEs	1.8	2.6	5.6	9.3	8.5
-Speedup		1.0	1.2	2.2	3.0	2.1	1.7
+Speedup		1.0	1.2	2.1	3.0	2.1	1.7
 
 Rotate: Version = rotate_2_unroll_and_param_optim:
 Dim		64	128	256	512	1024	Mean
-Your CPEs	1.7	1.8	1.9	2.7	3.7
+Your CPEs	1.6	1.8	1.9	2.7	3.8
 Baseline CPEs	1.8	2.6	5.6	9.3	8.5
-Speedup		1.1	1.4	2.9	3.5	2.3	2.0
+Speedup		1.1	1.4	2.9	3.5	2.2	2.1
 
 Rotate: Version = rotate: current:
 Dim		64	128	256	512	1024	Mean
-Your CPEs	1.6	1.8	1.9	2.6	3.7
+Your CPEs	1.6	1.8	1.9	2.5	3.9
 Baseline CPEs	1.8	2.6	5.6	9.3	8.5
-Speedup		1.1	1.4	2.9	3.5	2.3	2.1
+Speedup		1.1	1.4	2.9	3.7	2.2	2.1
 
 Smooth: Version = smooth: Current working version:
 Dim		32	64	128	256	512	Mean
-Your CPEs	48.3	50.8	51.0	51.5	52.5
+Your CPEs	12.3	12.5	12.8	12.7	13.1
 Baseline CPEs	49.4	51.8	52.0	52.4	53.3
-Speedup		1.0	1.0	1.0	1.0	1.0	1.0
+Speedup		4.0	4.1	4.1	4.1	4.1	4.1
 
 Smooth: Version = naive_smooth: Naive baseline implementation:
 Dim		32	64	128	256	512	Mean
-Your CPEs	49.5	51.8	52.0	52.4	52.8
+Your CPEs	49.3	51.7	52.0	51.3	51.7
 Baseline CPEs	49.4	51.8	52.0	52.4	53.3
 Speedup		1.0	1.0	1.0	1.0	1.0	1.0
 
 Summary of Your Best Scores:
   Rotate: 2.1 (rotate: current)
-  Smooth: 1.0 (smooth: Current working version)
+  Smooth: 4.1 (smooth: Current working version)
 
