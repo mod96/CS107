@@ -284,41 +284,6 @@ static pixel avg(int dim, int i, int j, pixel *src)
 }
 
 
-
-/* 
- * assign_sum_to_pixel - Computes averaged pixel value in current_pixel 
- */
-static void assign_sum_to_pixel_(pixel *current_pixel, pixel_sum sum) 
-{
-		int n = sum.num;
-    current_pixel->red = (unsigned short) (sum.red/n);
-    current_pixel->green = (unsigned short) (sum.green/n);
-    current_pixel->blue = (unsigned short) (sum.blue/n);
-    return;
-}
-
-/* 
- * avg - Returns averaged pixel value at (i,j) 
- */
-static pixel avg_(int dim, int i, int j, pixel *src) 
-{
-    int ii, jj;
-		int ii_left=max(i-1, 0), ii_right=min(i+1, dim-1),
-				jj_left=max(j-1, 0), jj_right=min(j+1, dim-1);
-    pixel_sum sum;
-    pixel current_pixel;
-
-    initialize_pixel_sum(&sum);
-    for(ii = ii_left; ii <= ii_right; ii++) 
-			for(jj = jj_left; jj <= jj_right; jj++) 
-	    	accumulate_sum(&sum, src[RIDX(ii, jj, dim)]);
-
-    assign_sum_to_pixel_(&current_pixel, sum);
-    return current_pixel;
-}
-
-
-
 /******************************************************
  * Your different versions of the smooth kernel go here
  ******************************************************/
@@ -346,10 +311,59 @@ char smooth_descr[] = "smooth: Current working version";
 void smooth(int dim, pixel *src, pixel *dst) 
 {
     int i, j;
+		int t;
+		int limit;
+		
+		/* vertices */
+		t=0;
+    dst[t].red = (src[t].red+src[t+1].red+src[t+dim].red+src[t+dim+1].red)/4;
+    dst[t].green  = (src[t].green +src[t+1].green +src[t+dim].green +src[t+dim+1].green )/4;
+    dst[t].blue = (src[t].blue+src[t+1].blue+src[t+dim].blue+src[t+dim+1].blue)/4;
+		t=dim-1;
+		dst[t].red = (src[t].red+src[t-1].red+src[t+dim].red+src[t+dim-1].red)/4;
+		dst[t].green  = (src[t].green +src[t-1].green +src[t+dim].green +src[t+dim-1].green )/4;
+		dst[t].blue = (src[t].blue+src[t-1].blue+src[t+dim].blue+src[t+dim-1].blue)/4;
+		t=dim*dim-1;
+		dst[t].red = (src[t].red+src[t-1].red+src[t-dim].red+src[t-dim-1].red)/4;
+		dst[t].green  = (src[t].green +src[t-1].green +src[t-dim].green +src[t-dim-1].green )/4;
+		dst[t].blue = (src[t].blue+src[t-1].blue+src[t-dim].blue+src[t-dim-1].blue)/4;
+		t=dim*dim-dim;
+		dst[t].red = (src[t].red+src[t+1].red+src[t-dim].red+src[t-dim+1].red)/4;
+		dst[t].green  = (src[t].green +src[t+1].green +src[t-dim].green +src[t-dim+1].green )/4;
+		dst[t].blue = (src[t].blue+src[t+1].blue+src[t-dim].blue+src[t-dim+1].blue)/4;
 
-    for (i = 0; i < dim; i++) {
-			for (j = 0; j < dim; j++) {
-	    	dst[RIDX(i, j, dim)] = avg_(dim, i, j, src);
+		/* sides */
+		limit = dim * dim - 1; /* bottom */
+		for (i = limit - dim + 2; i < limit; i++) {
+			dst[i].red = ((src[i-1].red+src[i].red)+(src[i+1].red+src[i-dim-1].red)+(src[i-dim].red+src[i-dim+1].red))/6;
+			dst[i].green  = ((src[i-1].green +src[i].green )+(src[i+1].green +src[i-dim-1].green )+(src[i-dim].green +src[i-dim+1].green ))/6;
+			dst[i].blue = ((src[i-1].blue+src[i].blue)+(src[i+1].blue+src[i-dim-1].blue)+(src[i-dim].blue+src[i-dim+1].blue))/6;
+		}
+		limit = dim * dim - dim; /* left */
+		for (i = dim; i < limit; i+=dim) {
+			dst[i].red = ((src[i-dim].red+src[i-dim+1].red)+(src[i].red+src[i+1].red)+(src[i+dim].red+src[i+dim+1].red))/6;
+			dst[i].green  = ((src[i-dim].green +src[i-dim+1].green )+(src[i].green +src[i+1].green )+(src[i+dim].green +src[i+dim+1].green ))/6;
+			dst[i].blue = ((src[i-dim].blue+src[i-dim+1].blue)+(src[i].blue+src[i+1].blue)+(src[i+dim].blue+src[i+dim+1].blue))/6;
+		}
+		for (i = (dim << 1) - 1; i < limit; i+=dim) { /* right */
+			dst[i].red = ((src[i-dim-1].red+src[i-dim].red)+(src[i-1].red+src[i].red)+(src[i+dim-1].red+src[i+dim].red))/6;
+			dst[i].green  = ((src[i-dim-1].green +src[i-dim].green )+(src[i-1].green +src[i].green )+(src[i+dim-1].green +src[i+dim].green ))/6;
+			dst[i].blue = ((src[i-dim-1].blue+src[i-dim].blue)+(src[i-1].blue+src[i].blue)+(src[i+dim-1].blue+src[i+dim].blue))/6;
+		}
+		limit = dim - 1; /* top */
+		for (i = 1; i < limit; i++) {
+			dst[i].red = ((src[i-1].red+src[i].red)+(src[i+1].red+src[i+limit].red)+(src[i+dim].red+src[i+dim+1].red))/6;
+			dst[i].green  = ((src[i-1].green +src[i].green )+(src[i+1].green +src[i+limit].green )+(src[i+dim].green +src[i+dim+1].green ))/6;
+			dst[i].blue = ((src[i-1].blue+src[i].blue)+(src[i+1].blue+src[i+limit].blue)+(src[i+dim].blue+src[i+dim+1].blue))/6;
+		}
+
+		/* main loop */
+		for (i = 1; i < limit; i++) {
+			for (j = 1; j < limit; j++) {
+				t = i*dim + j;
+	    	dst[t].red = (((src[t-dim-1].red+src[t-dim].red)+(src[t-dim+1].red+src[t-1].red))+((src[t].red+src[t+1].red)+(src[t+dim-1].red+src[t+dim].red))+src[t+dim+1].red)/9;		
+	    	dst[t].green  = (((src[t-dim-1].green +src[t-dim].green )+(src[t-dim+1].green +src[t-1].green ))+((src[t].green +src[t+1].green )+(src[t+dim-1].green +src[t+dim].green ))+src[t+dim+1].green )/9;		
+	    	dst[t].blue = (((src[t-dim-1].blue+src[t-dim].blue)+(src[t-dim+1].blue+src[t-1].blue))+((src[t].blue+src[t+1].blue)+(src[t+dim-1].blue+src[t+dim].blue))+src[t+dim+1].blue)/9;		
 			}
 		}
 }
