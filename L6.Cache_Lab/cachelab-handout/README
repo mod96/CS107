@@ -67,7 +67,8 @@ Cache Lab summary:
                         Points   Max pts      Misses
 Csim correctness          27.0        27
 Trans perf 32x32           8.0         8         287
-Trans perf 64x64           6.6         8        1423
+Trans perf 64x64           6.6         8        1419
 Trans perf 61x67          10.0        10        1815
           Total points    51.6        53
+
 

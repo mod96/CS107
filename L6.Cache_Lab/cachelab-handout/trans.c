@@ -67,7 +67,7 @@ void transpose_submit(int M, int N, int A[N][M], int B[M][N])
 												B[j+1][i+p] = a2;
 												B[j+2][i+p] = a3;
 												B[j+3][i+p] = a4;
-												if (i < N - 8) {
+												if (i < N - 8 && j < M - 8) {
 														B[56][56+p] = a5;
 														B[57][56+p] = a6;
 														B[58][56+p] = a7;
@@ -93,7 +93,7 @@ void transpose_submit(int M, int N, int A[N][M], int B[M][N])
 												B[j+5][i+p] = a6;
 												B[j+6][i+p] = a7;
 												B[j+7][i+p] = a8;
-												if (i < N - 8) {
+												if (i < N - 8 && j < M - 8) {
 														B[56][56+p] = a1;
 														B[57][56+p] = a2;
 														B[58][56+p] = a3;
@@ -107,7 +107,7 @@ void transpose_submit(int M, int N, int A[N][M], int B[M][N])
 												}
 										}
 										for (p = 0; p < 4; p++) {
-												if (i < N - 8) {
+												if (i < N - 8 && j < M - 8) {
 														a1 = B[56+p][56];
 														a2 = B[56+p][57];
 														a3 = B[56+p][58];
