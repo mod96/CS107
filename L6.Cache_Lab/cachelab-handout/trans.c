@@ -22,6 +22,136 @@ int is_transpose(int M, int N, int A[N][M], int B[M][N]);
 char transpose_submit_desc[] = "Transpose submission";
 void transpose_submit(int M, int N, int A[N][M], int B[M][N])
 {
+		int a1, a2, a3, a4, a5, a6, a7, a8;
+		int i, j;
+		int p;
+		switch (M) {
+				case 32:
+				case 61:
+						for (j = 0; j < M; j += 8) {
+								for (i = 0; i < N; i++) {
+										a1 = A[i][j];
+										a2 = A[i][j+1];
+										a3 = A[i][j+2];
+										a4 = A[i][j+3];
+										a5 = A[i][j+4];
+										a6 = A[i][j+5];
+										a7 = A[i][j+6];
+										a8 = A[i][j+7];
+
+										B[j][i] = a1;
+										B[j+1][i] = a2;
+										B[j+2][i] = a3;
+										B[j+3][i] = a4;
+										B[j+4][i] = a5;
+										B[j+5][i] = a6;
+										B[j+6][i] = a7;
+										B[j+7][i] = a8;
+								}
+						}
+						break;
+				case 64:
+						for (i = 0; i < N; i += 8) {
+								for (j = 0; j < M; j += 8) {
+										for (p = 0; p < 4; p++) {
+												a1 = A[i+p][j];
+												a2 = A[i+p][j+1];
+												a3 = A[i+p][j+2];
+												a4 = A[i+p][j+3];
+												a5 = A[i+p][j+4];
+												a6 = A[i+p][j+5];
+												a7 = A[i+p][j+6];
+												a8 = A[i+p][j+7];
+
+												B[j][i+p] = a1;
+												B[j+1][i+p] = a2;
+												B[j+2][i+p] = a3;
+												B[j+3][i+p] = a4;
+												if (i < N - 8 && j < M - 8) {
+														B[56][56+p] = a5;
+														B[57][56+p] = a6;
+														B[58][56+p] = a7;
+														B[59][56+p] = a8;
+												} else {
+														B[j][i+p+4] = a5;
+														B[j+1][i+p+4] = a6;
+														B[j+2][i+p+4] = a7;
+														B[j+3][i+p+4] = a8;
+												}
+										}
+										for (p = 4; p < 8; p++) {
+												a1 = A[i+p][j];
+												a2 = A[i+p][j+1];
+												a3 = A[i+p][j+2];
+												a4 = A[i+p][j+3];
+												a5 = A[i+p][j+4];
+												a6 = A[i+p][j+5];
+												a7 = A[i+p][j+6];
+												a8 = A[i+p][j+7];
+
+												B[j+4][i+p] = a5;
+												B[j+5][i+p] = a6;
+												B[j+6][i+p] = a7;
+												B[j+7][i+p] = a8;
+												if (i < N - 8 && j < M - 8) {
+														B[56][56+p] = a1;
+														B[57][56+p] = a2;
+														B[58][56+p] = a3;
+														B[59][56+p] = a4;
+												} else {
+														B[j+4][i+p-4] = a1;
+														B[j+5][i+p-4] = a2;
+														B[j+6][i+p-4] = a3;
+														B[j+7][i+p-4] = a4;
+
+												}
+										}
+										for (p = 0; p < 4; p++) {
+												if (i < N - 8 && j < M - 8) {
+														a1 = B[56+p][56];
+														a2 = B[56+p][57];
+														a3 = B[56+p][58];
+														a4 = B[56+p][59];
+														a5 = B[56+p][60];
+														a6 = B[56+p][61];
+														a7 = B[56+p][62];
+														a8 = B[56+p][63];
+
+														B[j+p+4][i] = a1;
+														B[j+p+4][i+1] = a2;
+														B[j+p+4][i+2] = a3;
+														B[j+p+4][i+3] = a4;
+
+														B[j+p][i+4] = a5;
+														B[j+p][i+5] = a6;
+														B[j+p][i+6] = a7;
+														B[j+p][i+7] = a8;
+												} else {
+														a1 = B[j+p+4][i];
+														a2 = B[j+p+4][i+1];
+														a3 = B[j+p+4][i+2];
+														a4 = B[j+p+4][i+3];
+
+														a5 = B[j+p][i+4];
+														a6 = B[j+p][i+5];
+														a7 = B[j+p][i+6];
+														a8 = B[j+p][i+7];
+
+														B[j+p][i+4] = a1;
+														B[j+p][i+5] = a2;
+														B[j+p][i+6] = a3;
+														B[j+p][i+7] = a4;
+
+														B[j+p+4][i] = a5;
+														B[j+p+4][i+1] = a6;
+														B[j+p+4][i+2] = a7;
+														B[j+p+4][i+3] = a8;
+												}
+										}
+								}
+						}
+						break;
+		}
 }
 
 /* 
@@ -57,6 +187,7 @@ void registerFunctions()
 {
     /* Register your solution function */
     registerTransFunction(transpose_submit, transpose_submit_desc); 
+    //registerTransFunction(transpose_submit1, transpose_submit1_desc); 
 
     /* Register any additional transpose functions */
     registerTransFunction(trans, trans_desc); 
