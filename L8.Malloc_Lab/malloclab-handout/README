@@ -49,4 +49,13 @@ The -V option prints out helpful tracing and summary information.
 To get a list of the driver flags:
 
 	unix> mdriver -h
+	
+*******************************
+Result
+*******************************
+Team Name:mysterious
+Member 1 :lucan han:mod960403@gmail.com
+Using default tracefiles in ../tracefiles/
+Perf index = 44 (util) + 17 (thru) = 61/100
+
 
